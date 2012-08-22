@@ -1,0 +1,9 @@
+name = Group List
+description = "User group list."
+package = custom modules
+dependencies[] = hierarchical_select
+dependencies[] = hs_taxonomy
+dependencies[] = lightbox2
+dependencies[] = user_terms
+core = 6.x
+version = 6.x-2.x-dev

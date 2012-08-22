@@ -1,0 +1,24 @@
+
+/**
+ * Garland, for Drupal 6.x
+ * Stefan Nagtegaal, iStyledThis [dot] nl
+ * Steven Wittens, acko [dot] net`
+ *
+ * If you use a customized color scheme, you must regenerate it after
+ * modifying this file.
+ */
+
+/**
+ * Generic elements
+ */
+body {background:none!important;}
+#outerImageContainer { height: 148px !important;}
+.hierarchical-select-wrapper-wrapper {float: left;}
+#submit-form {float: left; margin-top: 34px;}
+#group-list-taxonomy-list table {clear:both; width: 70%;}
+#imageDataContainer #imageDetails {display:none!important;}
+#imageDataContainer {height: 40px;}
+#bottomNavClose {margin-top: 0px!important;}
+#lightboxFrame {border:none!important;}
+#submit-form {border:1px solid; background-color: #F8F7F6; text-align: center; width: 53px;cursor: pointer;}
+#taxonomy-remove {cursor: pointer;}

@@ -1,0 +1,156 @@
+<?php
+
+/**
+ * @file
+ * Group List module for list of all group with user.
+ *
+ */
+
+/**
+ * Implement hook_menu().
+ *
+ * Note that each item has both an entry point to prepare the form, and also
+ * a callback function that provides and AHAH menu callback.
+ */
+function group_list_menu() {
+  $items = array();
+
+  $items['group_list'] = array(
+    'title' => t('group_list'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('group_list_form'),
+    'access callback' => TRUE,
+    'type' => MENU_LOCAL_TASK,
+  );
+  $items['group_list_ajax'] = array(
+   'page callback' => 'group_list_user',
+   'access callback' => TRUE,
+   'type' => MENU_CALLBACK,
+   'file' => 'group_list.inc',
+  );
+  $items['group_list_taxonomy_list'] = array(
+   'page callback' => 'drupal_get_form',
+   'page arguments' => array('group_list_taxonomy_list'),
+   'access callback' => TRUE,
+   'type' => MENU_CALLBACK,
+  );
+  $items['group_list_taxonomy_list/callback'] = array(
+   'page callback' => 'group_list_taxonomy_list_callback',
+   'access callback' => TRUE,
+   'type' => MENU_CALLBACK,
+   'file' => 'group_list.inc',
+  );
+  $items['group_list_taxonomy'] = array(
+  'page callback' => 'drupal_get_form',
+  'page arguments' => array('group_list_taxonomy_all'),
+  'access callback' => TRUE,
+  'type' => MENU_CALLBACK,
+  );
+  $items['group_list_taxonomy_ajax'] = array(
+   'page callback' => 'group_list_taxonomy_ajax',
+   'access callback' => TRUE,
+   'type' => MENU_CALLBACK,
+   'file' => 'group_list.inc',
+  );
+  $items['group_list/delete/term/%'] = array(
+   'page callback' => 'group_list_taxonomy_delete',
+   'page arguments' => array(3),
+   'access callback' => TRUE,
+   'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+/**
+ * Implement hook_init().
+ */
+
+function group_list_init() {
+  drupal_add_js(drupal_get_path('module', 'group_list') . '/js/group_list.js');
+  drupal_add_css(drupal_get_path('module', 'group_list') .'/css/group_list.css');
+}
+
+/**
+ * Implement hook_form().
+ */
+function group_list_form($form_state) {
+  $form = array();
+
+  $form['#type'] = 'hierarchical_select';
+  $form['groups'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Groups'),
+    '#weight' => 5,
+  );
+  $form['groups']['all_groups'] = array(
+    '#type' => 'select',
+    '#options' => og_all_groups_options(),
+  );
+  $form['groups']['group_all_values'] = array(
+    '#type' => 'markup',
+    '#value' => '<div id="group_list"></div>',
+  );
+  return $form;
+}
+
+function group_list_taxonomy_list($form_state) {
+  $vid = 2;
+  $vocabulary = taxonomy_vocabulary_load($vid);  //use this new function
+  $form['groups']['tid'] = array(
+    '#type' => 'hierarchical_select',
+    '#title' => t('Add taxonomy'),
+    '#default_value' => '0',
+    '#config' => array(                //use the #config key instead of  #hierarchical_select_settings
+      'module' => 'hs_taxonomy',   //use hs_taxonomy, not taxonomy
+      'params' => array(
+                  'vid' => $vid,
+                ),
+      ),
+  );
+  $form['groups']['submit'] = array(
+    '#type' => 'markup',
+    '#value' => '<div id="submit-form">'.t('Add').'</div>',
+  );
+  $form['groups']['user-id'] = array(
+    '#type' => 'markup',
+    '#value' => '<div id="user-uid" style="display:none">'.$_REQUEST['id'].'</div>',
+  );
+  $form['groups']['taxonomy_values'] = array(
+    '#type' => 'markup',
+    '#value' => '<table><caption class="dropbox-title">All selections</caption><tbody><tr class="dropbox-entry first last dropbox-is-empty"><td>Nothing has been selected.</td></tr></tbody></table>',
+  );
+  return $form;
+}
+
+function group_list_taxonomy_all($form_state) {
+  $form = array();
+  
+  $form['taxonomy_groups'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Groups'),
+    '#weight' => 5,
+  );
+  $form['taxonomy_groups']['all_taxonomy'] = array(
+    '#type' => 'select',
+    '#options' => group_list_all_vocabularies(),
+  );
+  $form['taxonomy_groups']['taxonomy_all_values'] = array(
+    '#type' => 'markup',
+    '#value' => '<div id="taxonomy_group_list"></div>',
+  );
+  
+  return $form;
+}
+
+
+function group_list_all_vocabularies() {
+
+  $vocabulary = taxonomy_get_vocabularies();
+  $checklist_vocab_array = array(); /* Change to array('0' => '--none--'); if you want a none option*/
+  foreach ($vocabulary as $item) {
+    $key = $item->vid;
+    $value = $item->name;
+    $checklist_vocab_array[$key] = $value;
+  }
+  return $checklist_vocab_array;
+}
